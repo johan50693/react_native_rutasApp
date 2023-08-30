@@ -1,8 +1,22 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, {useEffect} from 'react';
 import MapView from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation';
+
 
 export const Map = () => {
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      info => console.log(info),
+      (err) => console.log(err),
+      {
+        enableHighAccuracy: true,
+      }
+      );
+    console.log('useEffect');
+  }, []);
+
   return (
       <>
         <MapView

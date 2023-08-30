@@ -6,7 +6,8 @@ export const Map = () => {
   return (
       <>
         <MapView
-        style= {{flex: 1}}
+          style= {{flex: 1}}
+          showsUserLocation= {true}
           initialRegion={{
             latitude: 37.78825,
             longitude: -122.4324,

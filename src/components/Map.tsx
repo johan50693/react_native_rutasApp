@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, { useRef } from 'react';
 import MapView from 'react-native-maps';
 import { useLocation } from '../hooks/useLocation';
 import { LoadingScreen } from '../pages/LoadingScreen';
@@ -8,7 +8,20 @@ import { Fab } from './Fab';
 
 export const Map = () => {
 
-  const {hasLocation,initialPosition} = useLocation();
+  const {hasLocation,initialPosition,getCurrentLocation} = useLocation();
+  const mapViewRef = useRef<MapView>();
+
+  const centerPosition = async () => {
+
+    const {latitud,longitud} = await getCurrentLocation();
+
+    mapViewRef.current?.animateCamera({
+      center: {
+        latitude: latitud,
+        longitude: longitud,
+      },
+    });
+  };
 
   if ( !hasLocation){
     return <LoadingScreen />;
@@ -17,6 +30,7 @@ export const Map = () => {
   return (
       <>
         <MapView
+        ref={ (el) => mapViewRef.current = el!}
           style= {{flex: 1}}
           showsUserLocation= {true}
           initialRegion={{
@@ -39,8 +53,8 @@ export const Map = () => {
         </MapView>
 
         <Fab
-          iconName="star-outline"
-          onPress={ () => console.log('click')}
+          iconName="compass-outline"
+          onPress={centerPosition}
           style={{
             position: 'absolute',
             bottom: 20,

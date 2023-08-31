@@ -13,23 +13,35 @@ export const useLocation = () => {
 
 
   useEffect(() => {
-    Geolocation.getCurrentPosition(
-      ({coords}) => {
-        setInitialPosition({
-          latitud: coords.latitude,
-          longitud: coords.longitude,
-        });
+
+    getCurrentLocation()
+      .then( location => {
+        setInitialPosition(location);
         setHasLocation(true);
-      },
-      (err) => console.log(err),
-      {
-        enableHighAccuracy: true,
-      }
-      );
+      });
+
   }, []);
+
+  const getCurrentLocation = ():Promise<Location> => {
+    return new Promise((resolve, reject) => {
+
+      Geolocation.getCurrentPosition(
+        ({coords}) => {
+          resolve({
+            latitud: coords.latitude,
+            longitud: coords.longitude,
+          });
+
+        },
+        (err) => reject(err),{enableHighAccuracy: true}
+        );
+
+    });
+  };
 
   return {
     hasLocation,
     initialPosition,
+    getCurrentLocation,
   };
 };

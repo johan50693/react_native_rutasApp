@@ -8,17 +8,21 @@ import { Fab } from './Fab';
 
 export const Map = () => {
 
-  const {hasLocation,initialPosition,getCurrentLocation,followUserLocation, userLocation} = useLocation();
+  const {hasLocation,initialPosition,getCurrentLocation,followUserLocation, userLocation,stopFollowUserLocation} = useLocation();
   const mapViewRef = useRef<MapView>();
+  const following = useRef<boolean>(true);
 
   useEffect(() => {
     followUserLocation();
     return () => {
       // TODO: Cancelar seguimiento
+      stopFollowUserLocation();
     };
   }, []);
 
   useEffect(() => {
+
+    if (!following.current) {return;}
 
     const {latitud,longitud} = userLocation;
     mapViewRef.current?.animateCamera({
@@ -34,6 +38,7 @@ export const Map = () => {
   const centerPosition = async () => {
 
     const {latitud,longitud} = await getCurrentLocation();
+    following.current = true;
 
     mapViewRef.current?.animateCamera({
       center: {
@@ -59,6 +64,7 @@ export const Map = () => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
+          onTouchStart={ () => following.current = false}
         >
           {/* <Marker
             image= {require('../assets/custom-marker.png')}

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import MapView from 'react-native-maps';
 import { useLocation } from '../hooks/useLocation';
 import { LoadingScreen } from '../pages/LoadingScreen';
@@ -8,8 +8,28 @@ import { Fab } from './Fab';
 
 export const Map = () => {
 
-  const {hasLocation,initialPosition,getCurrentLocation} = useLocation();
+  const {hasLocation,initialPosition,getCurrentLocation,followUserLocation, userLocation} = useLocation();
   const mapViewRef = useRef<MapView>();
+
+  useEffect(() => {
+    followUserLocation();
+    return () => {
+      // TODO: Cancelar seguimiento
+    };
+  }, []);
+
+  useEffect(() => {
+
+    const {latitud,longitud} = userLocation;
+    mapViewRef.current?.animateCamera({
+      center: {
+        latitude: latitud,
+        longitude: longitud,
+      },
+    });
+
+  }, [userLocation]);
+
 
   const centerPosition = async () => {
 

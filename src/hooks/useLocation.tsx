@@ -6,14 +6,15 @@ import { Location } from '../interfaces/appInterfaces';
 export const useLocation = () => {
 
   const [hasLocation, setHasLocation] = useState(false);
+  const [routeLocation, setRouteLocation] = useState<Location[]>([]);
   const [initialPosition, setInitialPosition] = useState<Location>({
-    latitud: 0,
-    longitud: 0,
+    latitude: 0,
+    longitude: 0,
   });
 
   const [userLocation, setUserLocation] = useState<Location>({
-    longitud: 0,
-    latitud: 0,
+    longitude: 0,
+    latitude: 0,
   });
 
   const watchId = useRef<number>();
@@ -24,6 +25,7 @@ export const useLocation = () => {
       .then( location => {
         setInitialPosition(location);
         setUserLocation(location);
+        setRouteLocation( routes => [...routes,location]);
         setHasLocation(true);
       });
 
@@ -35,8 +37,8 @@ export const useLocation = () => {
       Geolocation.getCurrentPosition(
         ({coords}) => {
           resolve({
-            latitud: coords.latitude,
-            longitud: coords.longitude,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
           });
 
         },
@@ -51,11 +53,13 @@ export const useLocation = () => {
 
     watchId.current = Geolocation.watchPosition(
       ({coords}) => {
-        console.log(coords);
-        setUserLocation({
-          latitud: coords.latitude,
-          longitud: coords.longitude,
-        });
+
+        const location: Location = {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        };
+        setUserLocation(location);
+        setRouteLocation( routes => [...routes,location]);
 
       },
       (err) => console.log(err),{enableHighAccuracy: true, distanceFilter: 10}
@@ -75,5 +79,6 @@ export const useLocation = () => {
     getCurrentLocation,
     followUserLocation,
     stopFollowUserLocation,
+    routeLocation,
   };
 };

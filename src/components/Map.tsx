@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useRef } from 'react';
-import MapView from 'react-native-maps';
+import MapView, { Polyline } from 'react-native-maps';
 import { useLocation } from '../hooks/useLocation';
 import { LoadingScreen } from '../pages/LoadingScreen';
 import { Fab } from './Fab';
@@ -8,7 +8,13 @@ import { Fab } from './Fab';
 
 export const Map = () => {
 
-  const {hasLocation,initialPosition,getCurrentLocation,followUserLocation, userLocation,stopFollowUserLocation} = useLocation();
+  const { hasLocation,
+          initialPosition,
+          getCurrentLocation,
+          followUserLocation,
+          userLocation,
+          stopFollowUserLocation,
+          routeLocation} = useLocation();
   const mapViewRef = useRef<MapView>();
   const following = useRef<boolean>(true);
 
@@ -24,11 +30,11 @@ export const Map = () => {
 
     if (!following.current) {return;}
 
-    const {latitud,longitud} = userLocation;
+    const {latitude,longitude} = userLocation;
     mapViewRef.current?.animateCamera({
       center: {
-        latitude: latitud,
-        longitude: longitud,
+        latitude: latitude,
+        longitude: longitude,
       },
     });
 
@@ -37,13 +43,13 @@ export const Map = () => {
 
   const centerPosition = async () => {
 
-    const {latitud,longitud} = await getCurrentLocation();
+    const {latitude,longitude} = await getCurrentLocation();
     following.current = true;
 
     mapViewRef.current?.animateCamera({
       center: {
-        latitude: latitud,
-        longitude: longitud,
+        latitude: latitude,
+        longitude: longitude,
       },
     });
   };
@@ -59,13 +65,18 @@ export const Map = () => {
           style= {{flex: 1}}
           showsUserLocation= {true}
           initialRegion={{
-            latitude: initialPosition.latitud,
-            longitude: initialPosition.longitud,
+            latitude: initialPosition.latitude,
+            longitude: initialPosition.longitude,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
           onTouchStart={ () => following.current = false}
         >
+          <Polyline
+            coordinates={routeLocation}
+            strokeColor="black"
+            strokeWidth={3}
+          />
           {/* <Marker
             image= {require('../assets/custom-marker.png')}
             coordinate={{
